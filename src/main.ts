@@ -111,31 +111,59 @@ const typeScriptQuiz: Quiz = {
 let question = document.querySelector('#question') as HTMLHeadingElement
 let radioInputContainer = document.querySelector('#radio-inputs-container') as HTMLDivElement
 let nextBtn = document.querySelector('#nextBtn') as HTMLButtonElement
+let quiz_container = document.querySelector('#quiz-container') as HTMLDivElement
+let result_container = document.querySelector('#result-container') as HTMLDivElement
 
 let currentIndex: number = 0
+let rightAnswer: number = 0
+let wrongAnswer: number = 0
 
 // RENDER HTML FUNCTION
 let renderHtml = () => {
     radioInputContainer.innerHTML = ''
-    let que = typeScriptQuiz.questions[currentIndex]
-    // console.log(que);
-    question.innerText = `${currentIndex + 1}) ${que.question}`
+    if (currentIndex === typeScriptQuiz.questions.length) {
+        quiz_container.style.display = 'none'
+        result_container.style.display = 'block'
+        quiz_container.innerHTML += `
+        <h1>${rightAnswer > wrongAnswer ? 'You Win' : 'You Lose'}</h1>
+        <div>Right Answer ${rightAnswer}</div>
+        <div>Wronge Answer ${wrongAnswer}</div>
+        `
+    }
+    if (currentIndex === typeScriptQuiz.questions.length - 1) {
+        nextBtn.innerText = 'Submit'
+    } else {
+        let que = typeScriptQuiz.questions[currentIndex]
+        question.innerText = `${currentIndex + 1}) ${que.question}`
 
-    let allOption = que.options.map((item, index) => radioInputContainer.innerHTML +=
-        `<label class="py-2">
+        let allOption = que.options.map((item, index) => radioInputContainer.innerHTML +=
+            `<label class="py-2">
                 <input type="radio" name="${currentIndex}" value="${item}">
                 <span class="px-2">${item}</span>
             </label class="py-2">`)
-    // console.log(allOption);
+        // console.log(allOption);
+    }
+
+    if (currentIndex === typeScriptQuiz.questions.length - 1) {
+        nextBtn.innerHTML = 'submit'
+    }
 }
 
 renderHtml()
 
 // NEXT BUTTON FUNCTION
 nextBtn.addEventListener('click', () => {
-    let selected = document.querySelector(`input[name='${currentIndex}']:checked`)
-    console.log(selected);
+    let selected = document.querySelector(`input[name='${currentIndex}']:checked`) as HTMLInputElement
     if (selected) {
+        if (selected.value === typeScriptQuiz.questions[currentIndex].correctAnswer) {
+            rightAnswer++
+            console.log(`right ${rightAnswer}`);
+
+        } else {
+            wrongAnswer++
+            console.log(`Wrong ${wrongAnswer}`);
+
+        }
         currentIndex++
         renderHtml()
     }
